@@ -1,0 +1,1 @@
+MT5_SYMBOL = "EURUSD"

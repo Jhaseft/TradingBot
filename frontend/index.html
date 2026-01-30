@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>MT5 Candles Live</title>
+  <style>
+    body {
+      font-family: monospace;
+      background: #020617;
+      color: #e5e7eb;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    .candle {
+      padding: 6px;
+      border-bottom: 1px solid #1e293b;
+    }
+    .up {
+      color: #22c55e;
+    }
+    .down {
+      color: #ef4444;
+    }
+  </style>
+</head>
+<body>
+
+<h1>📊 EURUSD – Velas (1m)</h1>
+<div id="candles"></div>
+
+<script>
+  const container = document.getElementById("candles");
+
+  async function loadCandles() {
+    const res = await fetch('/api/candles?symbol=GBPUSD&tf=1&limit=20');
+    const data = await res.json();
+
+    container.innerHTML = "";
+
+    data.reverse().forEach(c => {
+      const div = document.createElement("div");
+      const isUp = c.close >= c.open;
+
+      div.className = "candle " + (isUp ? "up" : "down");
+      div.textContent =
+        `⏱ ${new Date(c.time * 1000).toLocaleTimeString()}  ` +
+        `O:${c.open}  H:${c.high}  L:${c.low}  C:${c.close}`;
+
+      container.appendChild(div);
+    });
+  }
+
+  // cargar al iniciar
+  loadCandles();
+
+  // actualizar cada 2 segundos
+  setInterval(loadCandles, 2000);
+</script>
+
+</body>
+</html>
