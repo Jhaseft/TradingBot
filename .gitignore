@@ -1,5 +1,12 @@
-# Ignorar el entorno virtual
+# Entorno virtual
 venv/
+
+# Python cache
 __pycache__/
 *.pyc
+
+# Configs locales
 .env
+
+# Docker
+*.log
