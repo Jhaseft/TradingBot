@@ -1,0 +1,187 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #0b1120;
+  color: #e2e8f0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  padding: 2rem 1rem;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.header .subtitle {
+  font-size: 0.95rem;
+  color: #64748b;
+  font-weight: 400;
+}
+
+.header .subtitle span {
+  color: #94a3b8;
+}
+
+.header .subtitle .sep {
+  margin: 0 0.4rem;
+  color: #334155;
+}
+
+/* Summary Cards */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.card {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  text-align: center;
+}
+
+.card .label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #64748b;
+  margin-bottom: 0.35rem;
+}
+
+.card .value {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+
+.card .value.green { color: #34d399; }
+.card .value.red { color: #f87171; }
+.card .value.blue { color: #60a5fa; }
+.card .value.yellow { color: #fbbf24; }
+
+/* Table */
+.table-wrapper {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.table-wrapper h2 {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+  padding: 1rem 1.25rem 0.75rem;
+  border-bottom: 1px solid #334155;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th {
+  background: #162032;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+  padding: 0.65rem 1rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+td {
+  padding: 0.7rem 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  border-top: 1px solid #1a2640;
+  font-variant-numeric: tabular-nums;
+}
+
+tr:hover td {
+  background: #162032;
+}
+
+td.green { color: #34d399; }
+td.red { color: #f87171; }
+
+/* Footer */
+.footer {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #475569;
+}
+
+.footer .dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #34d399;
+  border-radius: 50%;
+  margin-right: 0.4rem;
+  vertical-align: middle;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* Empty state */
+.empty {
+  text-align: center;
+  padding: 4rem 2rem;
+}
+
+.empty h2 {
+  color: #475569;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.empty p {
+  color: #334155;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  table {
+    font-size: 0.8rem;
+  }
+
+  th, td {
+    padding: 0.5rem 0.6rem;
+  }
+}

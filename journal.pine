@@ -1,10 +1,10 @@
-//@version=5
+//@version=6
 indicator("Journal Dashboard", overlay=true)
 // --- { Matrix & arrays 
 type Dat
     matrix<int> MTX
     matrix<float> PNL
-    matrix<float> PLOTh
+    matrix<float> PLOT
     matrix<float> Maxprofit
     array<color> Col
     array<float> MAXPF
@@ -28,7 +28,7 @@ var BackTest = Dat.new(
      array.new_float(7),
      array.new_float(7),
      array.new_float(7),
-     array.new_float(7),
+     array.new_bool(7, false),
      array.new_float(1,0),
      array.new_box(14),
      array.new_float(50),
