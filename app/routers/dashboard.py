@@ -69,6 +69,8 @@ WS_SCRIPT = """
             var wrc = tr.insertCell(); wrc.textContent = row.winrate + '%'; wrc.className = row.winrate >= 50 ? 'green' : 'red';
             var pfc = tr.insertCell(); pfc.textContent = row.profit_factor; pfc.className = row.profit_factor >= 1 ? 'green' : 'red';
             var pnlc = tr.insertCell(); pnlc.textContent = row.pnl_percent + '%'; pnlc.className = row.pnl_percent >= 0 ? 'green' : 'red';
+            tr.insertCell().textContent = Number(row.sl_price).toFixed(2);
+            tr.insertCell().textContent = Number(row.tp_price).toFixed(2);
         });
 
         // Update footer timestamp
@@ -131,15 +133,17 @@ def dashboard():
         wr_class = "green" if wr_val >= 50 else "red"
 
         rows += f"""
-            <tr>
-                <td>{row['rr']}</td>
-                <td>{row['total_trades']}</td>
-                <td class="green">{row['wins']}</td>
-                <td class="red">{row['losses']}</td>
-                <td class="{wr_class}">{wr_val}%</td>
-                <td class="{pf_class}">{pf_val}</td>
-                <td class="{pnl_class}">{pnl_val}%</td>
-            </tr>"""
+        <tr>
+            <td>{row['rr']}</td>
+            <td>{row['total_trades']}</td>
+            <td class="green">{row['wins']}</td>
+            <td class="red">{row['losses']}</td>
+            <td class="{wr_class}">{wr_val}%</td>
+            <td class="{pf_class}">{pf_val}</td>
+            <td class="{pnl_class}">{pnl_val}%</td>
+            <td>{round(row['sl_price'], 2)}</td>
+            <td>{round(row['tp_price'], 2)}</td>
+        </tr>"""
 
     html = f"""
     <html>
@@ -196,6 +200,8 @@ def dashboard():
                         <th>Winrate</th>
                         <th>PF</th>
                         <th>PNL %</th>
+                        <th>SL</th>
+                        <th>TP</th>
                     </tr>
                     {rows}
                 </table>

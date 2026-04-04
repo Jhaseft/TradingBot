@@ -1,61 +1,104 @@
-from app.services.mt5_broker import open_trade, close_trade
+from app.services.mt5_broker import open_trade
 
 ACTIVE_TRADES = {}
 
+
+def calculate_btc_trade(entry_price, sl_price, capital, risk_percent=0.10, rr=5):
+    """
+    BTCUSD:
+    - Riesgo fijo %
+    - Lote dinámico según distancia al SL
+    - TP automático RR 1:5
+    """
+
+    riesgo = capital * risk_percent
+    stop_distance = abs(entry_price - sl_price)
+
+    if stop_distance == 0:
+        return None
+
+    lotaje = riesgo / stop_distance
+    tp_distance = stop_distance * rr
+    tp_price = entry_price + tp_distance  # SOLO BUY
+
+    return {
+        "lotaje": round(lotaje, 3),
+        "tp_price": round(tp_price, 2),
+        "stop_distance": round(stop_distance, 2),
+    }
+
+
+def select_best_row(rows):
+    if not rows:
+        return None
+
+    positive_rows = [r for r in rows if r.get("pnl_percent", 0) > 0]
+
+    if not positive_rows:
+        print("No hay filas con PnL positivo")
+        return None
+
+    return sorted(
+        positive_rows,
+        key=lambda x: (x.get("pnl_percent", 0), x.get("winrate", 0)),
+        reverse=True
+    )[0]
+
+
 def handle_signal(data):
+
     print("Recibiendo señal:", data)
 
-    # Solo extraemos lo mínimo necesario
     symbol = data.get("symbol")
-    print(f"Símbolo extraído: {symbol}")
-    volume = 0.01  # fijo por ahora
-    sl = None
-    tp = None
-
-    # Decidimos la señal en base a tu 'strategy' o evento
-    event = data.get("event", "").lower()
-    print(f"Evento extraído: {event}")
-    strategy = data.get("strategy", "").lower()
-    print(f"Estrategia extraída: {strategy}")
-
-    # Simple heurística para LONG/SHORT/CLOSE según tu info del webhook
-    if "long" in strategy:
-        signal = "LONG"
-    elif "short" in strategy:
-        signal = "SHORT"
-    elif "close" in strategy or event == "close_position":
-        signal = "CLOSE"
-    else:
-        signal = None
-
-    if not symbol or not signal:
-        print("No hay símbolo o señal válida, no hacemos nada")
+    if symbol != "BTCUSD":
+        print("Solo operamos BTCUSD")
         return
 
+    rows = data.get("data", [])
+    best_row = select_best_row(rows)
+
+    if not best_row:
+        print("No hay configuración rentable, no operamos")
+        return
+
+    entry_price = float(data["entry_price"])
+    sl = float(best_row["sl_price"])
+    capital = float(data["capital"])
+
+    trade_calc = calculate_btc_trade(
+        entry_price=entry_price,
+        sl_price=sl,
+        capital=capital,
+        risk_percent=0.10,
+        rr=5
+    )
+
+    if not trade_calc:
+        print("Error en cálculo")
+        return
+
+    volume = trade_calc["lotaje"]
+    tp = trade_calc["tp_price"]
+
+    print(f"Entry: {entry_price}")
+    print(f"SL: {sl}")
+    print(f"TP (1:5): {tp}")
+    print(f"Volumen dinámico: {volume}")
+
     try:
-        # LONG
-        if signal == "LONG" and symbol not in ACTIVE_TRADES:
-            print(f"Intentando abrir LONG en {symbol} con volumen {volume}")
-            result = open_trade(symbol, "BUY", volume, sl, tp)
-            ACTIVE_TRADES[symbol] = getattr(result, "order", None)
-            print(f"LONG abierto, order ID: {ACTIVE_TRADES[symbol]}")
+        print(f"Abriendo BUY en {symbol}")
 
-        # SHORT
-        elif signal == "SHORT" and symbol not in ACTIVE_TRADES:
-            print(f"Intentando abrir SHORT en {symbol} con volumen {volume}")
-            result = open_trade(symbol, "SELL", volume, sl, tp)
-            ACTIVE_TRADES[symbol] = getattr(result, "order", None)
-            print(f"SHORT abierto, order ID: {ACTIVE_TRADES[symbol]}")
+        result = open_trade(
+            symbol=symbol,
+            sl=sl,
+            tp=tp,
+            volume=volume
+        )
 
-        # CLOSE
-        elif signal == "CLOSE" and symbol in ACTIVE_TRADES:
-            print(f"Intentando cerrar posición en {symbol}, order ID: {ACTIVE_TRADES[symbol]}")
-            close_trade(ACTIVE_TRADES[symbol])
-            del ACTIVE_TRADES[symbol]
-            print(f"Posición cerrada en {symbol}")
+        ticket = getattr(result, "order", None)
+        ACTIVE_TRADES[symbol] = ticket
 
-        else:
-            print(f"No se ejecuta ninguna acción para la señal: {signal}")
+        print(f"Trade abierto ID: {ticket}")
 
     except Exception as e:
-        print(f"Error manejando señal {signal} para {symbol}: {e}")
+        print(f"Error abriendo trade: {e}")
