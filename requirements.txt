@@ -1,3 +1,6 @@
 fastapi
-uvicorn
+uvicorn[standard]
 websockets
+MetaTrader5
+mysql-connector-python
+requests
